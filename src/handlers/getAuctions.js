@@ -1,13 +1,19 @@
 import AWS from 'aws-sdk';
 import commonMiddleware from '../lib/commonMiddleware';
-import createError from "http-errors";
-
+import CreateError from "http-errors";
+import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
+import validator from '@middy/validator';
+import getAuctionsSchema from '../lib/schemas/getAuctionsSchema';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function getAuctions(event, context) {
   const { status } = event.queryStringParameters;
   let auctions;
+
+  // if (!getAuctionsSchema.properties.queryStringParameters.properties.status.enum.map(statusEnum => statusEnum === status)) {
+  //   throw new CreateError(400, `The search term ${status} does not exist`);
+  // }
 
   const params = {
     TableName: process.env.AUCTIONS_TABLE_NAME,
@@ -26,7 +32,7 @@ async function getAuctions(event, context) {
     auctions = result.Items;
   } catch(error) {
     console.log(error);
-    throw new createError.InternalServerError(error);
+    throw new CreateError.InternalServerError(error);
   }
 
   return {
@@ -35,4 +41,9 @@ async function getAuctions(event, context) {
     };
 }
 
-export const handler = commonMiddleware(getAuctions);
+export const handler = commonMiddleware(getAuctions)
+  .use([
+    validator({ inputSchema: getAuctionsSchema, useDefaults: true }),
+    JSONErrorHandlerMiddleware(),
+  ])
+;
