@@ -58,8 +58,8 @@ functions:
 
   processAuction:
     handler: src/handlers/processAuction.handler
-#    events:
-#      - schedule: rate(1 minute)
+    events:
+      - schedule: rate(1 minute)
 
 
 custom:
