@@ -15,7 +15,7 @@ provider:
     - ${file(iam/MailQueueIAM.yml):MailQueueIAM}
   environment:
     AUCTIONS_TABLE_NAME: ${self:custom.AuctionsTable.name}
-    MAIL_QUEUE_URL: ${self:custom.MailQueueUrl}
+    MAIL_QUEUE_URL: ${self:custom.MailQueue.url}
   apiGateway:
     shouldStartNameWithService: true
 
@@ -56,8 +56,8 @@ functions:
           path: /auction/{id}/bid
           authorizer: ${self:custom.authorizer}
 
-  processAuctions:
-    handler: src/handlers/processAuctions.handler
+  processAuction:
+    handler: src/handlers/processAuction.handler
 #    events:
 #      - schedule: rate(1 minute)
 

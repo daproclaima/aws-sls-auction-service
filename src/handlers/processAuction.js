@@ -1,8 +1,8 @@
 import createError from 'http-errors';
 import { getEndedAuctions} from '../lib/getEndedAuctions';
-import { closeAuction } from '../lib/closeAuctions';
+import { closeAuction } from '../lib/closeAuction';
 
-async function processAuctions(event, context) {
+async function processAuction(event, context) {
 
   try {
   const auctionsToClose = await getEndedAuctions();
@@ -17,4 +17,4 @@ async function processAuctions(event, context) {
 
 }
 
-export const handler = processAuctions;
+export const handler = processAuction;
