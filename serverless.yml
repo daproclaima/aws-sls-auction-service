@@ -13,15 +13,19 @@ provider:
   iamRoleStatements:
     - ${file(iam/AuctionsTableIAM.yml):AuctionsTableIAM}
     - ${file(iam/MailQueueIAM.yml):MailQueueIAM}
+    - ${file(iam/AuctionsBucketIAM.yml):AuctionsBucketIAM}
   environment:
     AUCTIONS_TABLE_NAME: ${self:custom.AuctionsTable.name}
     MAIL_QUEUE_URL: ${self:custom.MailQueue.url}
+    AUCTIONS_BUCKET_NAME: ${self:custom.AuctionsBucket.name}
   apiGateway:
     shouldStartNameWithService: true
 
 resources:
   Resources:
     AuctionsTable: ${file(resources/AuctionsTable.yml):AuctionsTable}
+    AuctionsBucket: ${file(resources/AuctionsBucket.yml):AuctionsBucket}
+    AuctionsBucketPolicy: ${file(resources/AuctionsBucket.yml):AuctionsBucketPolicy}
 
 functions:
   createAuction:
@@ -56,8 +60,16 @@ functions:
           path: /auction/{id}/bid
           authorizer: ${self:custom.authorizer}
 
+  uploadAuctionPicture:
+    handler: src/handlers/uploadAuctionPicture.handler
+    events:
+      - http:
+          method: PATCH
+          path: /auction/{id}/picture
+          authorizer: ${self:custom.authorizer}
+
   processAuction:
-    handler: src/handlers/processAuction.handler
+    handler: src/handlers/uploadAuctionPicture.handler
     events:
       - schedule: rate(1 minute)
 
@@ -70,3 +82,5 @@ custom:
   MailQueue:
     arn: ${cf:notification-service-${self:provider.stage}.MailQueueArn}
     url: ${cf:notification-service-${self:provider.stage}.MailQueueUrl}
+  AuctionsBucket:
+    name: auctions-bucket-nobour-${self:provider.stage}
