@@ -25,7 +25,7 @@ async function placeBid(event, _) {
   }
 
   if (email === auction.highestBid.bidder) {
-    throw new createError.Forbidden(`You just placed the bid. Wait for an other person to place a bid and try again.`);
+    throw new createError.Forbidden(`You already are the highest bidder`);
   }
 
   if (amount <= auction.highestBid.amount) {
