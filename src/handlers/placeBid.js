@@ -12,12 +12,22 @@ async function placeBid(event, _) {
 
   const { id } = event.pathParameters;
   const { amount } = event.body;
+  const { email } =  event.requestContext.authorizer;
 
   const auction = await getAuctionById(id);
 
   if (auction.status !== 'OPEN') {
     throw new createError.Forbidden(`You can not bid on closed auctions`);
   }
+
+  if (email === auction.seller) {
+     throw new createError.Forbidden(`You can not place a bid on your own auction!`);
+  }
+
+  if (email === auction.highestBid.bidder) {
+    throw new createError.Forbidden(`You just placed the bid. Wait for an other person to place a bid and try again.`);
+  }
+
   if (amount <= auction.highestBid.amount) {
     throw new createError.Forbidden(`Your bid must be higher than ${auction.highestBid.amount}!`);
   }
@@ -25,9 +35,10 @@ async function placeBid(event, _) {
   const params = {
     TableName: process.env.AUCTIONS_TABLE_NAME,
     Key: { id },
-    UpdateExpression: 'set highestBid.amount = :amount',
+    UpdateExpression: 'set highestBid.amount = :amount, highestBid.bidder = :bidder',
     ExpressionAttributeValues: {
       ':amount': amount,
+      ':bidder': email,
     },
     ReturnValues: 'ALL_NEW',
   };
