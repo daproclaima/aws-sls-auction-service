@@ -1,4 +1,5 @@
 const schema = {
+  type: 'strict',
   properties: {
     body: {
       type: 'object',
