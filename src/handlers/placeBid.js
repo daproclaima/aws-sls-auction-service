@@ -9,7 +9,6 @@ import  JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function placeBid(event, _) {
-
   const { id } = event.pathParameters;
   const { amount } = event.body;
   const { email } =  event.requestContext.authorizer;
@@ -21,7 +20,7 @@ async function placeBid(event, _) {
   }
 
   if (email === auction.seller) {
-     throw new createError.Forbidden(`You can not place a bid on your own auction!`);
+    throw new createError.Forbidden(`You can not place a bid on your own auction!`);
   }
 
   if (email === auction.highestBid.bidder) {
@@ -46,7 +45,6 @@ async function placeBid(event, _) {
   let updatedAuction;
 
   try {
-
     const result = await dynamodb.update(params).promise();
     updatedAuction = result.Attributes;
   } catch(error) {
@@ -55,13 +53,13 @@ async function placeBid(event, _) {
   }
 
   return {
-      statusCode: 200,
-      body: JSON.stringify(updatedAuction),
-    };
+    statusCode: 200,
+    body: JSON.stringify(updatedAuction),
+  };
 }
 
 export const handler = commonMiddleware(placeBid)
   .use([
-    validator({ inputSchema: placeBidSchema,}),
+    validator({ inputSchema: placeBidSchema }),
     JSONErrorHandlerMiddleware(),
   ]);

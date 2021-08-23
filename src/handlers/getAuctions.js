@@ -36,14 +36,16 @@ async function getAuctions(event, context) {
   }
 
   return {
-      statusCode: 200,
-      body: JSON.stringify(auctions),
-    };
+    statusCode: 200,
+    body: JSON.stringify(auctions),
+  };
 }
 
 export const handler = commonMiddleware(getAuctions)
   .use([
-    validator({ inputSchema: getAuctionsSchema, useDefaults: true }),
+    validator({
+      inputSchema: getAuctionsSchema,
+      useDefaults: true
+    }),
     JSONErrorHandlerMiddleware(),
-  ])
-;
+  ]);

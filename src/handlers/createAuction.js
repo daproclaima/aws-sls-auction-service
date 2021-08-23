@@ -14,6 +14,7 @@ async function createAuction(event, _) {
   const now = new Date();
   let endDate = new Date();
   endDate.setHours(now.getHours() + 1);
+  // endDate.setDays(now.getDays() + 1);
 
   const auction = {
     id: uuid(),
@@ -34,14 +35,13 @@ async function createAuction(event, _) {
       Item: auction,
     }).promise();
   } catch(error) {
-    console.log(error);
     throw new createError.InternalServerError(error);
   }
 
   return {
-      statusCode: 201,
-      body: JSON.stringify({ auction }),
-    };
+    statusCode: 201,
+    body: JSON.stringify({ auction }),
+  };
 }
 
 export const handler = commonMiddleware(createAuction)
